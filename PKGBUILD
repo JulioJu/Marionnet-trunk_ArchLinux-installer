@@ -27,11 +27,13 @@ source=("http://caml.inria.fr/pub/distrib/ocaml-3.12/ocaml-3.12.1.tar.gz"
         'http://wwwfun.kurims.kyoto-u.ac.jp/soft/lsl/dist/lablgtk-2.14.2.tar.gz'
         "https://www.marionnet.org/download/marionnet_from_scratch/mirror/ocamlbricks-trunk.tar.gz"
         "https://www.marionnet.org/download/marionnet_from_scratch/mirror/marionnet-trunk.tar.gz"
+        "https://raw.githubusercontent.com/JulioJu/Marionnet-trunk_ArchLinux-installer/master/Makefile.patch"
 )
 sha256sums=('4f81ab86258be0eea1507dd5338c8670490f8616249821e731f8ac1c64caa4a7'
             '4981abedabdc462303f345104042c88af227ccd50fd30a9bf48fd353ab02d0ba'
             '646b6de59a555b2e41960708cf4edfed571d88369d850a50e23bf4a4b17ed329'
-            '610c806e595be4d56ff6cded02e8d8a3091fe211487073c02ddb5132c3b4ffb6')
+            '610c806e595be4d56ff6cded02e8d8a3091fe211487073c02ddb5132c3b4ffb6'
+            'efb09389cc67a88b16509dec3ca3fb32f1da1f4c5808b8f2e7e2f050376bf691')
 install=marionnet.install
 
 # ################
@@ -69,60 +71,57 @@ build () {
     export PATH="${PREFIX}/bin:${PATH}"
     LIB_OCAML="${PREFIX}/lib/ocaml/"
 
-#     ### OCAML ###
-#
-#     cd "${OCAML_DIR}"
-#
-#     ./configure -prefix "${PREFIX}" -no-curses -no-tk
-#     make world.opt &&
-#     make install
-#
-#     make -C tools/ objinfo
-#
-#     if [[ ! -e "${PREFIX}/bin/ocamlobjinfo" ]]; then
-#         cp tools/objinfo ${PREFIX}/bin/ &&
-#             [[ -e ${PREFIX}/bin/ocamlobjinfo ]] || ln -s objinfo \
-#         ${PREFIX}/bin/ocamlobjinfo
-#     fi
-#
-#     # #### Liblgtk2 ###
-#     cd "${LABLGTK2_DIR}"
-#     ./configure --prefix="${PREFIX}" \
-#     --with-glade --without-gl --without-rsvg --without-gnomecanvas --without-gnomeui \
-#     --without-panel --without-gtkspell --without-gtksourceview --with-gtksourceview2 \
-#     --without-quartz &&
-#     make &&
-#     make opt &&
-#     make install
-#
-#
-#     #### OCAMLBRICKS ##########
-#     cd "${OCAMLBRICK_DIR}"
-# cat > CONFIGME <<EOF
-# ocaml_libraryprefix="${LIB_OCAML}"
-# libraryprefix="${LIB_OCAML}"
-# prefix="${PREFIX}"
-# configurationprefix="\${prefix}/etc"
-# documentationprefix="\${prefix}/share/doc"
-# localeprefix="\${prefix}/share/locale"
-# ocaml_sources="${LIB_OCAML}/caml"
-# ocaml_version=`ocamlc -version`
-# EOF
-#
-#     make clean &&
-#     make &&
-#     make install
-    ############# MARIONNET ###########
+    ### OCAML ###
+
+    cd "${OCAML_DIR}"
+
+    ./configure -prefix "${PREFIX}" -no-curses -no-tk
+    make world.opt &&
+    make install
+
+    make -C tools/ objinfo
+
+    if [[ ! -e "${PREFIX}/bin/ocamlobjinfo" ]]; then
+        cp tools/objinfo ${PREFIX}/bin/ &&
+            [[ -e ${PREFIX}/bin/ocamlobjinfo ]] || ln -s objinfo \
+        ${PREFIX}/bin/ocamlobjinfo
+    fi
+
+    # #### Liblgtk2 ###
+    cd "${LABLGTK2_DIR}"
+    ./configure --prefix="${PREFIX}" \
+    --with-glade --without-gl --without-rsvg --without-gnomecanvas --without-gnomeui \
+    --without-panel --without-gtkspell --without-gtksourceview --with-gtksourceview2 \
+    --without-quartz &&
+    make &&
+    make opt &&
+    make install
+
+
+    #### OCAMLBRICKS ##########
+    cd "${OCAMLBRICK_DIR}"
+cat > CONFIGME <<EOF
+ocaml_libraryprefix="${LIB_OCAML}"
+libraryprefix="${LIB_OCAML}"
+prefix="${PREFIX}"
+configurationprefix="\${prefix}/etc"
+documentationprefix="\${prefix}/share/doc"
+localeprefix="\${prefix}/share/locale"
+ocaml_sources="${LIB_OCAML}/caml"
+ocaml_version=`ocamlc -version`
+EOF
+
+    make clean &&
+    make &&
+    make install
+    ############ MARIONNET ###########
 
 
     cd "${MARIONNET_DIR}"
 
     # Makefile patch 
 
-    cp ${startdir}/Makefile.patch .
-    patch Makefile < Makefile.patch
-
-
+    patch Makefile < ../Makefile.patch
 
     # Configure CONFIGME
 cat > CONFIGME <<EOF
